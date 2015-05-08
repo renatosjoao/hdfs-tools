@@ -12,39 +12,52 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
-public class RemoveFiles{
+public class RemoveFiles {
 
 	public static void main(String[] args) throws Exception {
-		    String master = "hdfs://master.ib:8020";
-		    final long start = System.currentTimeMillis();
-		    int count = 0;
-		    try {
-				final Configuration conf = new Configuration();
-				conf.set("fs.defaultFS", master);
-				final FileSystem dfs = FileSystem.get(conf);
-				RemoteIterator<LocatedFileStatus> iter = dfs.listFiles(new Path("/user/joao/FTDdeTA"), true);
-	    		String path;
-	    		while (iter.hasNext()) {
-	    			LocatedFileStatus ls = iter.next();
-	    			path = ls.getPath().toString();
-	    			if(dfs.exists(new Path(path))){
-	    				//I only want to delete files that are compressed .gz and with size 20 bytes
-	    				if( (path.endsWith(".gz")) && (ls.getLen() == 20) ){
-	    					count++;
-	    					dfs.delete(new Path(path), true);
-	    					//System.out.println(path + " " + ls.getLen());	
-	    				}	    			    
-	    			}
-	    		}
-		    } catch (final Exception e) {
-				System.err.println(e);
-				e.printStackTrace();
+
+		if (args.length < 3) {
+            System.err.println("Usage: Runnable.jar " + "hdfsAddress "+ "fileType " + "size ");
+            System.err.println("i.e. : RemoveFiles.jar hdfs://master.ib:8020 GZip 20");
+            System.exit(1);
+        }
+
+		System.out.println(args[0]);
+		String hdfsAddress = args[0];
+		String fileType = args[1];
+		String size = args[2];
+		String master = hdfsAddress;
+		final long start = System.currentTimeMillis();
+		int count = 0;
+		try {
+			final Configuration conf = new Configuration();
+			conf.set("fs.defaultFS", master);
+			final FileSystem dfs = FileSystem.get(conf);
+			RemoteIterator<LocatedFileStatus> iter = dfs.listFiles(new Path(
+					"/user/joao/FTDdeTA"), true);
+			String path;
+			while (iter.hasNext()) {
+				LocatedFileStatus ls = iter.next();
+				path = ls.getPath().toString();
+				if (dfs.exists(new Path(path))) {
+					// I only want to delete files that are compressed .gz and
+					// with size 20 bytes
+					if ((path.endsWith("."+fileType)) && (ls.getLen() == Integer.parseInt(size))) {
+						count++;
+						dfs.delete(new Path(path), true);
+						// System.out.println(path + " " + ls.getLen());
+					}
+				}
 			}
-
-		    final long stop = System.currentTimeMillis();
-		    System.err.println("Finished deleting " + count + " files in " + ((stop - start)/1000) + " seconds");
-
+		} catch (final Exception e) {
+			System.err.println(e);
+			e.printStackTrace();
 		}
-	
+
+		final long stop = System.currentTimeMillis();
+		System.err.println("Finished deleting " + count + " files in "
+				+ ((stop - start) / 1000) + " seconds");
+
 	}
 
+}
