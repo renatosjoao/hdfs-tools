@@ -16,16 +16,16 @@ public class RemoveFiles {
 
 	public static void main(String[] args) throws Exception {
 
-		if (args.length < 3) {
-            System.err.println("Usage: Runnable.jar " + "hdfsAddress "+ "fileType " + "size ");
-            System.err.println("i.e. : RemoveFiles.jar hdfs://master.ib:8020 GZip 20");
+		if (args.length < 4) {
+            System.err.println("Usage: Runnable.jar " + "hdfsAddress "+ "fileType " + "hdfsDirectory " + "size ");
+            System.err.println("i.e. : RemoveFiles.jar hdfs://master.ib:8020 /user/joe/dir gz 20");
             System.exit(1);
         }
 
-		System.out.println(args[0]);
 		String hdfsAddress = args[0];
-		String fileType = args[1];
-		String size = args[2];
+		String hdfsDir = args[1];
+		String fileType = args[2];
+		String size = args[3];
 		String master = hdfsAddress;
 		final long start = System.currentTimeMillis();
 		int count = 0;
@@ -33,8 +33,7 @@ public class RemoveFiles {
 			final Configuration conf = new Configuration();
 			conf.set("fs.defaultFS", master);
 			final FileSystem dfs = FileSystem.get(conf);
-			RemoteIterator<LocatedFileStatus> iter = dfs.listFiles(new Path(
-					"/user/joao/FTDdeTA"), true);
+			RemoteIterator<LocatedFileStatus> iter = dfs.listFiles(new Path(hdfsDir), true);
 			String path;
 			while (iter.hasNext()) {
 				LocatedFileStatus ls = iter.next();
