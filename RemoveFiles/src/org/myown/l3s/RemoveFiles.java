@@ -14,6 +14,13 @@ import org.apache.hadoop.fs.RemoteIterator;
 
 public class RemoveFiles {
 
+/***
+ *  This is a utility tool to remove files from hdfs smaller than X bytes
+ *  specified as input argument.
+ *
+ * @param args
+ * @throws Exception
+ */
 	public static void main(String[] args) throws Exception {
 
 		if (args.length < 4) {
